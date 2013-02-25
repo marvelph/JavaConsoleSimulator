@@ -116,15 +116,17 @@ public class Console {
 		}
 
 		public void setX(int x) {
-			if (0 <= x && x < Console.WIDTH) {
-				this.x = x;
+			if (x < 0 || Console.WIDTH <= x) {
+				throw new IndexOutOfBoundsException("");
 			}
+			this.x = x;
 		}
 
 		public void setY(int y) {
-			if (0 <= y && y < Console.HEIGHT) {
-				this.y = y;
+			if (y < 0 || Console.HEIGHT <= y) {
+				throw new IndexOutOfBoundsException("");
 			}
+			this.y = y;
 		}
 
 		public void print(char c) {
