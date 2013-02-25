@@ -1,6 +1,8 @@
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -165,13 +167,16 @@ public class Console {
 
 		@Override
 		public void paint(Graphics g) {
+			((Graphics2D)g).setBackground(Color.black);
 			g.clearRect(0, 0, getWidth(), getHeight());
 			
 			Insets insets = getInsets();
+			setFont(new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE));
 			FontMetrics metrics = g.getFontMetrics();
 			int width = metrics.charWidth('W');
 			int height = metrics.getHeight();
 			int ascent = metrics.getAscent();
+			g.setColor(Color.white);
 			
 			for (int y = 0; y < Console.HEIGHT; y++) {
 				for (int x = 0; x < Console.WIDTH; x++) {
