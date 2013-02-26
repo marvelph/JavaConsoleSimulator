@@ -56,6 +56,14 @@ public class Console {
 		return frame.pressed(keyCode);
 	}
 
+	public static void sleep(int ms) {
+		try {
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException e) {
+		}
+	}
+
 	private static void init() {
 		if (frame == null) {
 			try {
