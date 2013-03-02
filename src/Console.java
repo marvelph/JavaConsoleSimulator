@@ -43,6 +43,12 @@ public class Console {
         frame.clear();
     }
 
+    public static char scan(int x, int y) {
+        init();
+
+        return frame.scan(x, y);
+    }
+
     public static boolean pressed(char keyCode) {
         init();
 
@@ -120,14 +126,14 @@ public class Console {
 
         public void setX(int x) {
             if (x < 0 || Console.WIDTH <= x) {
-                throw new IndexOutOfBoundsException("");
+                throw new IndexOutOfBoundsException();
             }
             this.x = x;
         }
 
         public void setY(int y) {
             if (y < 0 || Console.HEIGHT <= y) {
-                throw new IndexOutOfBoundsException("");
+                throw new IndexOutOfBoundsException();
             }
             this.y = y;
         }
@@ -155,6 +161,13 @@ public class Console {
             }
 
             super.repaint();
+        }
+
+        public char scan(int x, int y) {
+            if (x < 0 || Console.WIDTH <= x || y < 0 || Console.HEIGHT <= y) {
+                throw new IndexOutOfBoundsException();
+            }
+            return this.screenBuffer[y][x];
         }
 
         public boolean pressed(int keyCode) {
