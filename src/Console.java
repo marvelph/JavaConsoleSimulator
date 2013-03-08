@@ -46,6 +46,12 @@ public class Console {
         }
     }
 
+    public static void print(int i) {
+        init();
+
+        Console.print(String.valueOf(i));
+    }
+
     public static void clear() {
         init();
 
