@@ -112,6 +112,7 @@ public class Console {
     private static class Screen {
 
         private static final int FONT_SIZE = 12;
+        private static final int MAX_CHAR_CODE = 255;
         private static final int KEY_BUFFER_SIZE = 256;
 
         private char[][] screenBuffer;
@@ -224,6 +225,9 @@ public class Console {
         }
 
         public void print(char c) {
+            if (c > MAX_CHAR_CODE) {
+                throw new IndexOutOfBoundsException();
+            }
             this.screenBuffer[this.y][this.x] = c;
             this.colorBuffer[this.y][this.x] = this.color;
 
