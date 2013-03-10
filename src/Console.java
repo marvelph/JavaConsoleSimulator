@@ -23,6 +23,15 @@ public class Console {
     public static final char UP = KeyEvent.VK_UP;
     public static final char DOWN = KeyEvent.VK_DOWN;
 
+    public static final byte BLACK = 0;
+    public static final byte BLUE = 1;
+    public static final byte RED = 2;
+    public static final byte MAGENTA = 3;
+    public static final byte GREEN = 4;
+    public static final byte CYAN = 5;
+    public static final byte YELLOW = 6;
+    public static final byte WHITE = 7;
+      
     private static volatile Screen screen = null;
 
     public static void locate(int x, int y) {
@@ -30,6 +39,12 @@ public class Console {
 
         screen.setX(x);
         screen.setY(y);
+    }
+
+    public static void color(byte color) {
+        init();
+
+        screen.setColor(color);
     }
 
     public static void print(char c) {
@@ -100,13 +115,17 @@ public class Console {
         private static final int KEY_BUFFER_SIZE = 256;
 
         private char[][] screenBuffer;
+        private byte[][] colorBuffer;
         private int x;
         private int y;
+        private byte color;
         private boolean[] keyBuffer;
         private JFrame frame;
         private Content content;
 
         public class Content extends JComponent {
+
+        	private final Color[] colorMap = {Color.BLACK, Color.BLUE, Color.RED, Color.MAGENTA, Color.GREEN, Color.CYAN, Color.YELLOW, Color.WHITE};
 
         	private Font font;
         	private int width;
@@ -134,10 +153,10 @@ public class Console {
                 g.clearRect(0, 0, getWidth(), getHeight());
 
                 g.setFont(this.font);
-                g.setColor(Color.white);
 
                 for (int y = 0; y < Console.HEIGHT; y++) {
                     for (int x = 0; x < Console.WIDTH; x++) {
+                    	g.setColor(this.colorMap[Screen.this.colorBuffer[y][x]]);
                         g.drawChars(Screen.this.screenBuffer[y], x, 1, x * this.width, y * this.height + this.ascent);
                     }
                 }
@@ -147,6 +166,13 @@ public class Console {
 
         public Screen() {
             this.screenBuffer = new char[Console.HEIGHT][Console.WIDTH];
+            for (int y = 0; y < Console.HEIGHT; y++) {
+                for (int x = 0; x < Console.WIDTH; x++) {
+                    this.screenBuffer[y][x] = ' ';
+                }
+            }
+            this.colorBuffer = new byte[Console.HEIGHT][Console.WIDTH];
+            this.color = Console.WHITE;
             this.keyBuffer = new boolean[KEY_BUFFER_SIZE];
 
         	this.frame = new JFrame("Screen");
@@ -190,8 +216,16 @@ public class Console {
             this.y = y;
         }
 
+        public void setColor(byte color) {
+            if (color <= Console.BLACK || Console.WHITE <= color) {
+                throw new IndexOutOfBoundsException();
+            }
+            this.color = color;
+        }
+
         public void print(char c) {
             this.screenBuffer[this.y][this.x] = c;
+            this.colorBuffer[this.y][this.x] = this.color;
 
             this.x++;
             if (this.x == Console.WIDTH) {
@@ -208,7 +242,7 @@ public class Console {
         public void clear() {
             for (int y = 0; y < Console.HEIGHT; y++) {
                 for (int x = 0; x < Console.WIDTH; x++) {
-                    this.screenBuffer[y][x] = 0;
+                    this.screenBuffer[y][x] = ' ';
                 }
             }
 
