@@ -86,6 +86,7 @@ public class Block {
 		}
 	}
 
+	// 進行方向の正面のx座標を返す
 	private static int xFront(int x, int way) {
 		switch (way) {
 		case LEFT_UP:
@@ -101,6 +102,7 @@ public class Block {
 		}
 	}
 
+	// 進行方向の正面のy座標を返す
 	private static int yFront(int y, int way) {
 		switch (way) {
 		case LEFT_UP:
@@ -116,6 +118,7 @@ public class Block {
 		}
 	}
 
+	// 進行方向の左前のx座標を返す
 	private static int xLeft(int x, int way) {
 		switch (way) {
 		case LEFT_UP:
@@ -127,6 +130,7 @@ public class Block {
 		}
 	}
 
+	// 進行方向の左前のy座標を返す
 	private static int yLeft(int y, int way) {
 		switch (way) {
 		case RIGHT_UP:
@@ -138,6 +142,7 @@ public class Block {
 		}
 	}
 
+	// 進行方向の右前のx座標を返す
 	private static int xRight(int x, int way) {
 		switch (way) {
 		case RIGHT_UP:
@@ -149,6 +154,7 @@ public class Block {
 		}
 	}
 
+	// 進行方向の右前のy座標を返す
 	private static int yRight(int y, int way) {
 		switch (way) {
 		case LEFT_UP:
@@ -181,6 +187,7 @@ public class Block {
 		return Console.scan(x, y);
 	}
 
+	// もしも壊せるならば指定座標のブロックを消す
 	private static void hit(int x, int y) {
 		if (Console.scan(x, y) == '=') {
 			Console.locate(x, y);
@@ -230,33 +237,37 @@ public class Block {
 			Console.print(' ');
 
 			// 周りの文字に衝突している場合は進行方向を変更する
-			// 進行方向の左右両前に文字がある場合は後ろ方向に反転する
+			// 進行方向の左右両前に文字がある場合は
 			if (scanLeft(ballX, ballY, ballWay) != ' ' && scanRight(ballX, ballY, ballWay) != ' ') {
-				// もしも壊せるならば進行方向の左右両前にあるブロックを消す
+				// もしも壊せるならば進行方向の左右両前にある文字を消す
 				hitLeft(ballX, ballY, ballWay);
 				hitRight(ballX, ballY, ballWay);
-				
+
+				// 後ろ方向に反転する
 				ballWay = backTurn(ballWay);
 			}
-			// 進行方向の左前に文字があり右前に文字が無い場合は右に反転する
+			// 進行方向の左前に文字があり右前に文字が無い場合は
 			else if (scanLeft(ballX, ballY, ballWay) != ' ') {
-				// もしも壊せるならば進行方向の左前にあるブロックを消す
+				// もしも壊せるならば進行方向の左前にある文字を消す
 				hitLeft(ballX, ballY, ballWay);
-				
+
+				// 右に反転する
 				ballWay = rightTurn(ballWay);
 			}
-			// 進行方向の右前に文字があり左前に文字が無い場合は右に反転する
+			// 進行方向の右前に文字があり左前に文字が無い場合は
 			else if (scanRight(ballX, ballY, ballWay) != ' ') {
-				// もしも壊せるならば進行方向の右前にあるブロックを消す
+				// もしも壊せるならば進行方向の右前にある文字を消す
 				hitRight(ballX, ballY, ballWay);
-				
+
+				// 右に反転する
 				ballWay = leftTurn(ballWay);
 			}
-			// 進行方向の左右両前に文字が無く正面に文字ある場合は後ろ方向に反転する
+			// 進行方向の左右両前に文字が無く正面に文字ある場合は
 			else if (scanFront(ballX, ballY, ballWay) != ' ') {
-				// もしも壊せるならば進行方向の正面にあるブロックを消す
+				// もしも壊せるならば進行方向の正面にある文字を消す
 				hitFront(ballX, ballY, ballWay);
-				
+
+				// 後ろ方向に反転する
 				ballWay = backTurn(ballWay);
 			}
 
