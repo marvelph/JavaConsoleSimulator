@@ -1,8 +1,10 @@
 public class Block {
 
 	// キーボードの操作を定数として定義する
-	private static final char LEFT = 'A';
-	private static final char RIGHT = 'S';
+	private static final char FAST_LEFT = 'A';
+	private static final char LEFT = 'S';
+	private static final char RIGHT = 'D';
+	private static final char FAST_RIGHT = 'F';
 	// ボールの飛ぶ方向を定数として定義する
 	private static final int LEFT_UP = 0;
 	private static final int RIGHT_UP = 1;
@@ -23,6 +25,16 @@ public class Block {
 			Console.print('#');
 			Console.locate(Console.WIDTH - 1, y);
 			Console.print('#');
+		}
+	}
+
+	// 破壊できるブロックを用意する
+	private static void drawBlocks() {
+		for (int y = 4; y < 8; y++) {
+			for (int x = 1; x < Console.WIDTH - 2; x++) {
+				Console.locate(x, y);
+				Console.print('=');
+			}
 		}
 	}
 
@@ -74,57 +86,135 @@ public class Block {
 		}
 	}
 
-	// 進行方向の正面の文字を返す
-	private static char scanFront(int x, int y, int way) {
+	private static int xFront(int x, int way) {
 		switch (way) {
 		case LEFT_UP:
-			return Console.scan(x - 1, y - 1);
+			return x - 1;
 		case RIGHT_UP:
-			return Console.scan(x + 1, y - 1);
+			return x + 1;
 		case RIGHT_DOWN:
-			return Console.scan(x + 1, y + 1);
+			return x + 1;
 		case LEFT_DOWN:
-			return Console.scan(x - 1, y + 1);
+			return x -1;
 		default:
-			return ' ';
+			return x;
 		}
+	}
+
+	private static int yFront(int y, int way) {
+		switch (way) {
+		case LEFT_UP:
+			return y - 1;
+		case RIGHT_UP:
+			return y - 1;
+		case RIGHT_DOWN:
+			return y + 1;
+		case LEFT_DOWN:
+			return y + 1;
+		default:
+			return y;
+		}
+	}
+
+	private static int xLeft(int x, int way) {
+		switch (way) {
+		case LEFT_UP:
+			return x - 1;			
+		case RIGHT_DOWN:
+			return x + 1;
+		default:
+			return x;
+		}
+	}
+
+	private static int yLeft(int y, int way) {
+		switch (way) {
+		case RIGHT_UP:
+			return y - 1;
+		case LEFT_DOWN:
+			return y + 1;
+		default:
+			return y;
+		}
+	}
+
+	private static int xRight(int x, int way) {
+		switch (way) {
+		case RIGHT_UP:
+			return x + 1;
+		case LEFT_DOWN:
+			return x - 1;
+		default:
+			return x;
+		}
+	}
+
+	private static int yRight(int y, int way) {
+		switch (way) {
+		case LEFT_UP:
+			return y - 1;			
+		case RIGHT_DOWN:
+			return y + 1;
+		default:
+			return y;
+		}
+	}
+
+	// 進行方向の正面の文字を返す
+	private static char scanFront(int x, int y, int way) {
+		x = xFront(x, way);			
+		y = yFront(y, way);
+		return Console.scan(x, y);
 	}
 
 	// 進行方向の左前側の文字を返す
 	private static char scanLeft(int x, int y, int way) {
-		switch (way) {
-		case LEFT_UP:
-			return Console.scan(x - 1, y);
-		case RIGHT_UP:
-			return Console.scan(x, y - 1);
-		case RIGHT_DOWN:
-			return Console.scan(x + 1, y);
-		case LEFT_DOWN:
-			return Console.scan(x, y + 1);
-		default:
-			return ' ';
-		}
+		x = xLeft(x, way);			
+		y = yLeft(y, way);
+		return Console.scan(x, y);
 	}
 
 	// 進行方向の右前側の文字を返す
 	private static char scanRight(int x, int y, int way) {
-		switch (way) {
-		case LEFT_UP:
-			return Console.scan(x, y - 1);
-		case RIGHT_UP:
-			return Console.scan(x + 1, y);
-		case RIGHT_DOWN:
-			return Console.scan(x, y + 1);
-		case LEFT_DOWN:
-			return Console.scan(x - 1, y);
-		default:
-			return ' ';
+		x = xRight(x, way);			
+		y = yRight(y, way);
+		return Console.scan(x, y);
+	}
+
+	private static void hit(int x, int y) {
+		if (Console.scan(x, y) == '=') {
+			Console.locate(x, y);
+			Console.print(' ');
 		}
+	}
+
+	// もしも壊せるならば進行方向の正面にあるブロックを消す
+	private static void hitFront(int x, int y, int way) {
+		x = xFront(x, way);			
+		y = yFront(y, way);
+		hit(x, y);
+	}
+
+	// もしも壊せるならば進行方向の左前にあるブロックを消す
+	private static void hitLeft(int x, int y, int way) {
+		x = xLeft(x, way);			
+		y = yLeft(y, way);
+		hit(x, y);
+	}
+
+	// もしも壊せるならば進行方向の右前にあるブロックを消す
+	private static void hitRight(int x, int y, int way) {
+		x = xRight(x, way);			
+		y = yRight(y, way);
+		hit(x, y);
 	}
 
 	public static void main(String[] args) {
 		// 外壁を描く
 		drawWall();
+
+		// 破壊できるブロックを用意する
+		drawBlocks();
 
 		// バーの横方向の中心座標を変数宣言する
 		int barX = 10;
@@ -142,18 +232,31 @@ public class Block {
 			// 周りの文字に衝突している場合は進行方向を変更する
 			// 進行方向の左右両前に文字がある場合は後ろ方向に反転する
 			if (scanLeft(ballX, ballY, ballWay) != ' ' && scanRight(ballX, ballY, ballWay) != ' ') {
+				// もしも壊せるならば進行方向の左右両前にあるブロックを消す
+				hitLeft(ballX, ballY, ballWay);
+				hitRight(ballX, ballY, ballWay);
+				
 				ballWay = backTurn(ballWay);
 			}
 			// 進行方向の左前に文字があり右前に文字が無い場合は右に反転する
 			else if (scanLeft(ballX, ballY, ballWay) != ' ') {
+				// もしも壊せるならば進行方向の左前にあるブロックを消す
+				hitLeft(ballX, ballY, ballWay);
+				
 				ballWay = rightTurn(ballWay);
 			}
 			// 進行方向の右前に文字があり左前に文字が無い場合は右に反転する
 			else if (scanRight(ballX, ballY, ballWay) != ' ') {
+				// もしも壊せるならば進行方向の右前にあるブロックを消す
+				hitRight(ballX, ballY, ballWay);
+				
 				ballWay = leftTurn(ballWay);
 			}
 			// 進行方向の左右両前に文字が無く正面に文字ある場合は後ろ方向に反転する
 			else if (scanFront(ballX, ballY, ballWay) != ' ') {
+				// もしも壊せるならば進行方向の正面にあるブロックを消す
+				hitFront(ballX, ballY, ballWay);
+				
 				ballWay = backTurn(ballWay);
 			}
 
@@ -186,10 +289,16 @@ public class Block {
 			Console.print("     ");
 
 			// キーボードが押されていたらバーの位置を移動する
-			if (Console.pressed(LEFT)) {
+			if (Console.pressed(FAST_LEFT)) {
 				barX -= 2;
 			}
+			else if (Console.pressed(LEFT)) {
+				barX -= 1;
+			}
 			else if (Console.pressed(RIGHT)) {
+				barX += 1;
+			}
+			else if (Console.pressed(FAST_RIGHT)) {
 				barX += 2;
 			}
 
