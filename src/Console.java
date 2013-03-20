@@ -93,6 +93,10 @@ public class Console {
         }
     }
 
+    public static int random(int max) {
+    	return (int)(Math.random() * max);
+    }
+
     private static void init() {
         if (screen == null) {
             try {
